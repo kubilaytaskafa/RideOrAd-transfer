@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VIP Transfer - Rezervasyon Bilgileri</title>
+    <style type="text/css">
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+      body,
+      p,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: #f5f5f5;
+        color: #333333;
+        line-height: 1.6;
+      }
+
+      .email-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+      }
+
+      .header {
+        text-align: center;
+        padding: 30px 0;
+        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+        color: #ffffff;
+        border-radius: 10px 10px 0 0;
+      }
+
+      @keyframes gradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .content {
+        padding: 30px;
+        background-color: white;
+        border-left: 1px solid #e0e0e0;
+        border-right: 1px solid #e0e0e0;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 20px;
+        background-color: #333333;
+        color: #ffffff;
+        border-radius: 0 0 10px 10px;
+      }
+
+      .logo {
+        max-width: 150px;
+        height: auto;
+        margin-bottom: 20px;
+      }
+
+      .reservation-title {
+        color: #ffffff;
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .reservation-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 16px;
+        font-weight: 300;
+      }
+
+      .greeting {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: #333333;
+      }
+
+      .reservation-details {
+        margin-top: 30px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .detail-header {
+        background-color: #f7f7f7;
+        padding: 15px;
+        font-weight: 600;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .detail-row {
+        display: flex;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+
+      .detail-label {
+        flex: 0 0 40%;
+        background-color: #f7f7f7;
+        padding: 12px 15px;
+        font-weight: 500;
+      }
+
+      .detail-value {
+        flex: 0 0 60%;
+        padding: 12px 15px;
+      }
+
+      .thank-you {
+        margin-top: 30px;
+        font-size: 16px;
+        color: #555555;
+      }
+
+      .cta-button {
+        display: inline-block;
+        margin-top: 25px;
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+        color: white;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 500;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .social-links {
+        margin-top: 15px;
+      }
+
+      .social-icon {
+        display: inline-block;
+        margin: 0 8px;
+        width: 32px;
+        height: 32px;
+        background-color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 32px;
+      }
+
+      .contact-info {
+        margin-top: 15px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .highlight {
+        color: #b21f1f;
+        font-weight: 600;
+      }
+
+      @media only screen and (max-width: 600px) {
+        .detail-row {
+          flex-direction: column;
+        }
+
+        .detail-label,
+        .detail-value {
+          flex: 0 0 100%;
+        }
+
+        .detail-label {
+          border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detail-row:last-child .detail-label {
+          border-bottom: 1px solid #e0e0e0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="header">
+        <img
+          src="https://via.placeholder.com/150x50/FFFFFF/000000?text=RideOrAd"
+          alt="RideOrAd"
+          class="logo"
+        />
+        <h1 class="reservation-title">Rezervasyon Onayı</h1>
+        <p class="reservation-subtitle">Transfer talebiniz başarıyla alındı</p>
+      </div>
+
+      <div class="content">
+        <p class="greeting">Sayın <span class="highlight">{{name}}</span>,</p>
+
+        <p>
+          RideOrAd transfer hizmetimizi tercih ettiğiniz için teşekkür ederiz.
+          Rezervasyon talebiniz başarıyla alınmıştır. Rezervasyon detaylarınız
+          aşağıda yer almaktadır.
+        </p>
+
+        <div class="reservation-details">
+          <div class="detail-header">Rezervasyon Bilgileri</div>
+
+          <div class="detail-row">
+            <div class="detail-label">Referans No</div>
+            <div class="detail-value">#ROA-{{random}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">İsim</div>
+            <div class="detail-value">{{name}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">E-posta</div>
+            <div class="detail-value">{{email}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Telefon</div>
+            <div class="detail-value">{{phone}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Alış Noktası</div>
+            <div class="detail-value">{{pickupLocation}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Bırakış Noktası</div>
+            <div class="detail-value">{{dropoffLocation}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Tarih</div>
+            <div class="detail-value">{{date}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Saat</div>
+            <div class="detail-value">{{time}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Yolcu Sayısı</div>
+            <div class="detail-value">{{passengers}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Araç Tipi</div>
+            <div class="detail-value">{{vehicleType}}</div>
+          </div>
+        </div>
+
+        <p class="thank-you">
+          En kısa sürede sizinle iletişime geçerek rezervasyonunuzu
+          onaylayacağız. Herhangi bir sorunuz olması durumunda, lütfen bizimle
+          iletişime geçmekten çekinmeyin.
+        </p>
+
+        <div style="text-align: center">
+          <a href="https://www.viptransfer.com/contact" class="cta-button"
+            >İletişime Geç</a
+          >
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>© 2023 RideOrAd. Tüm hakları saklıdır.</p>
+        <div class="social-links">
+          <a href="#" class="social-icon">F</a>
+          <a href="#" class="social-icon">T</a>
+          <a href="#" class="social-icon">I</a>
+        </div>
+        <div class="contact-info">
+          <p>Telefon: +90 507 030 72 80 | E-posta: info@rideroad.com</p>
+          <p>Adres: Meydan Mahallesi 1234 Sokak No:5, Konyaaltı, Antalya</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

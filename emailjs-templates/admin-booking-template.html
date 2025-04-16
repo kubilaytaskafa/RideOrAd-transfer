@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Yeni Rezervasyon Bildirimi</title>
+    <style type="text/css">
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+      body,
+      p,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: #f5f5f5;
+        color: #333333;
+        line-height: 1.6;
+      }
+
+      .email-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+      }
+
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        background: #1e3a8a;
+        color: #ffffff;
+        border-radius: 10px 10px 0 0;
+      }
+
+      .content {
+        padding: 30px;
+        background-color: white;
+        border-left: 1px solid #e0e0e0;
+        border-right: 1px solid #e0e0e0;
+      }
+
+      .alert-section {
+        background-color: #f0f9ff;
+        border-left: 4px solid #0ea5e9;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+
+      .reservation-details {
+        margin-top: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .detail-header {
+        background-color: #f7f7f7;
+        padding: 12px 15px;
+        font-weight: 600;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .detail-row {
+        display: flex;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+
+      .detail-label {
+        flex: 0 0 35%;
+        background-color: #f7f7f7;
+        padding: 10px 15px;
+        font-weight: 500;
+      }
+
+      .detail-value {
+        flex: 0 0 65%;
+        padding: 10px 15px;
+      }
+
+      .action-buttons {
+        margin-top: 25px;
+        text-align: center;
+      }
+
+      .action-button {
+        display: inline-block;
+        margin: 0 8px;
+        padding: 10px 20px;
+        background-color: #1e3a8a;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .action-button.approve {
+        background-color: #10b981;
+      }
+
+      .action-button.reject {
+        background-color: #ef4444;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 20px;
+        background-color: #1e3a8a;
+        color: #ffffff;
+        border-radius: 0 0 10px 10px;
+        font-size: 14px;
+      }
+
+      .customer-info {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f7f7f7;
+        border-radius: 8px;
+      }
+
+      .notes {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        border-radius: 4px;
+      }
+
+      .timestamp {
+        margin-top: 20px;
+        font-size: 12px;
+        color: #6b7280;
+        text-align: right;
+      }
+
+      @media only screen and (max-width: 600px) {
+        .detail-row {
+          flex-direction: column;
+        }
+
+        .detail-label,
+        .detail-value {
+          flex: 0 0 100%;
+        }
+
+        .detail-label {
+          border-bottom: 1px solid #e0e0e0;
+        }
+
+        .action-buttons {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .action-button {
+          margin: 5px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="header">
+        <h1 style="font-size: 22px; margin-bottom: 5px">
+          Yeni Rezervasyon Bildirimi
+        </h1>
+        <p style="font-size: 14px; opacity: 0.9">
+          Yeni bir transfer rezervasyonu alındı
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="alert-section">
+          <p style="font-weight: 500; color: #0ea5e9">
+            Bu rezervasyon için onay gerekmektedir.
+          </p>
+          <p style="font-size: 14px">
+            Rezervasyon talebini inceleyerek onaylayabilir veya
+            reddedebilirsiniz.
+          </p>
+        </div>
+
+        <h2 style="font-size: 18px; margin-bottom: 15px">
+          Rezervasyon Bilgileri
+        </h2>
+
+        <div class="reservation-details">
+          <div class="detail-header">Rezervasyon ID: #VIP-{{random}}</div>
+
+          <div class="detail-row">
+            <div class="detail-label">Tarih</div>
+            <div class="detail-value">{{date}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Saat</div>
+            <div class="detail-value">{{time}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Alış Noktası</div>
+            <div class="detail-value">{{pickupLocation}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Bırakış Noktası</div>
+            <div class="detail-value">{{dropoffLocation}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Yolcu Sayısı</div>
+            <div class="detail-value">{{passengers}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Araç Tipi</div>
+            <div class="detail-value">{{vehicleType}}</div>
+          </div>
+        </div>
+
+        <div class="customer-info">
+          <h3 style="font-size: 16px; margin-bottom: 10px">
+            Müşteri Bilgileri
+          </h3>
+          <p><strong>İsim:</strong> {{name}}</p>
+          <p><strong>E-posta:</strong> {{email}}</p>
+          <p><strong>Telefon:</strong> {{phone}}</p>
+        </div>
+
+        <div class="notes">
+          <p>
+            <strong>Not:</strong> Bu rezervasyon web sitesi üzerinden
+            yapılmıştır. Müşteri onayınızı beklemektedir.
+          </p>
+        </div>
+
+        <div class="action-buttons">
+          <a
+            href="https://admin.viptransfer.com/reservations/{{random}}/approve"
+            class="action-button approve"
+            >Onayla</a
+          >
+          <a
+            href="https://admin.viptransfer.com/reservations/{{random}}/reject"
+            class="action-button reject"
+            >Reddet</a
+          >
+          <a
+            href="https://admin.viptransfer.com/reservations/{{random}}/edit"
+            class="action-button"
+            >Düzenle</a
+          >
+        </div>
+
+        <div class="timestamp">
+          <p>Rezervasyon Tarihi: {{system_date}}</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>
+          &copy; 2023 VIP Transfer | Bu e-posta otomatik olarak gönderilmiştir.
+        </p>
+        <p>
+          Desteğe ihtiyacınız varsa
+          <a href="mailto:support@viptransfer.com" style="color: #ffffff"
+            >support@viptransfer.com</a
+          >
+          adresine e-posta gönderin.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

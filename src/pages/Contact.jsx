@@ -1,244 +1,369 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
+import { init } from "@emailjs/browser";
 import emailjs from "@emailjs/browser";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+// Geliştirme modunda mı çalışıyoruz?
+const isDevelopment = import.meta.env.MODE === "development";
+
+// EmailJS değerleri için sabitler (.env dosyası okunamadığında kullanılır)
+const EMAILJS_SERVICE_ID = "service_ey2999j";
+const EMAILJS_TEMPLATE_ID = "template_y1ervmn";
+const EMAILJS_PUBLIC_KEY = "OTdF2FlNNag3Xv85R";
+const DEFAULT_WHATSAPP = "905070307280";
 
 const Contact = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const form = useRef();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // EmailJS'yi başlat
+  useEffect(() => {
+    // Sabit public key kullan - .env çalışmıyor gibi görünüyor
+    const publicKey = EMAILJS_PUBLIC_KEY;
+
+    if (publicKey) {
+      init(publicKey);
+      if (isDevelopment) {
+        console.log("EmailJS başlatıldı");
+        console.log("EmailJS Versiyon:", emailjs.version);
+      }
+    } else {
+      console.error("EmailJS Public Key tanımlanmadı!");
+    }
+
+    // Sadece geliştirme modunda çevre değişkenlerini kontrol et
+    if (isDevelopment) {
+      console.log("EmailJS Değerlerini kullanıyoruz:", {
+        serviceId: EMAILJS_SERVICE_ID,
+        templateId: EMAILJS_TEMPLATE_ID,
+        publicKey: EMAILJS_PUBLIC_KEY ? "******" : "yok",
+      });
+    }
+  }, []);
+
+  // Dil değişikliklerini izle
+  useEffect(() => {
+    // Sayfa başlığını güncelle
+    document.title = `${t("contact_title")} | RideOrAd`;
+
+    // Form sıfırlandığında başarı mesajını da temizle
+    setSuccess(false);
+  }, [i18n.language, t]);
+
+  // WhatsApp mesajı gönderme fonksiyonu
+  const sendWhatsAppMessage = (formData) => {
+    try {
+      const phone = import.meta.env.VITE_WHATSAPP_NUMBER || DEFAULT_WHATSAPP;
+      if (!phone) {
+        console.warn("WhatsApp numarası bulunamadı!");
+        return;
+      }
+
+      // Mesaj formatı
+      const message = `🔔 *${t("new_contact_message")}*
+      
+*${t("subject")}:* ${formData.subject}
+*${t("name")}:* ${formData.name}
+*${t("email")}:* ${formData.email}
+*${t("message_date")}:* ${formData.system_date}
+*${t("message_id")}:* #${formData.random}
+
+*${t("message")}:*
+${formData.message}
+
+*${t("language")}:* ${formData.language || "tr"}`;
+
+      // WhatsApp URL'sini oluştur
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const url = isMobile
+        ? `whatsapp://send?phone=${phone}&text=${encodeURIComponent(message)}`
+        : `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(
+            message
+          )}`;
+
+      // Yeni sekmede aç
+      window.open(url, "_blank");
+    } catch (error) {
+      console.error("WhatsApp mesajı gönderilirken hata oluştu:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setSuccess(false);
 
     try {
-      await emailjs.sendForm(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        form.current,
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      // Sistem tarihi oluştur
+      const now = new Date();
+      const systemDate = now.toLocaleString(
+        i18n.language === "tr" ? "tr-TR" : "en-US",
+        {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }
       );
+
+      // Rastgele ID oluştur (6 haneli)
+      const randomId = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Form elemanlarına değerleri ata
+      if (!form.current.system_date.value) {
+        form.current.system_date.value = systemDate;
+      }
+
+      if (!form.current.random.value) {
+        form.current.random.value = randomId;
+      }
+
+      if (!form.current.language.value) {
+        form.current.language.value = i18n.language;
+      }
+
+      // Form verilerini alıp logla
+      const formData = {
+        name: form.current.name.value,
+        email: form.current.email.value,
+        subject: form.current.subject.value,
+        message: form.current.message.value,
+        system_date: form.current.system_date.value,
+        random: form.current.random.value,
+        language: form.current.language.value,
+      };
+
+      // Sabit EmailJS değerlerini kullan (env değişkenleri çalışmıyor)
+      const serviceId = EMAILJS_SERVICE_ID;
+      const templateId = EMAILJS_TEMPLATE_ID;
+      const publicKey = EMAILJS_PUBLIC_KEY;
+
+      // Sadece geliştirme modunda log ekle
+      if (isDevelopment) {
+        console.log("Email Gönderiliyor...");
+        console.log("Form Data:", {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          language: formData.language,
+        });
+      }
+
+      // Konsola bir görsel ayraç ekle ki sonuçları daha kolay görelim
+      console.log("----------- EMAIL GÖNDERME BAŞLADI -----------");
+
+      // Email gönderimi
+      const result = await emailjs.sendForm(
+        serviceId,
+        templateId,
+        form.current,
+        publicKey
+      );
+
+      console.log("----------- EMAIL GÖNDERME SONUÇLANDI -----------");
+      console.log("EmailJS cevabı:", result.text);
+
+      // WhatsApp mesajı oluştur ve gönder
+      sendWhatsAppMessage(formData);
+
       setSuccess(true);
       form.current.reset();
     } catch (error) {
-      console.error("Contact form error:", error);
-      alert(t("contact_error"));
+      console.error(
+        "Email gönderme hatası:",
+        error.message || "Bilinmeyen hata"
+      );
+      console.error("Hata detayları:", error);
+
+      alert(
+        "Mesaj gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
+    <div className="container mx-auto py-12 px-4">
       <Helmet>
-        <title>{t("contact")} - VIP Transfer</title>
+        <title>{t("contact_title")} | RideOrAd</title>
         <meta name="description" content={t("contact_meta_description")} />
       </Helmet>
 
-      <div className="bg-gray-50 py-12">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl font-bold text-center mb-12">
-              {t("contact_us")}
-            </h1>
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-4xl font-bold mb-10 text-center">
+          {t("contact_title")}
+        </h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {/* Contact Information */}
-              <div>
-                <h2 className="text-2xl font-semibold mb-6">
-                  {t("contact_info")}
-                </h2>
-                <div className="space-y-6">
-                  <div className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-primary mt-1 mr-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                    <div>
-                      <h3 className="font-semibold mb-1">{t("address")}</h3>
-                      <p className="text-gray-600">
-                        Lorem ipsum dolor sit amet
-                        <br />
-                        consectetur adipiscing elit
-                        <br />
-                        12345 City, Country
-                      </p>
-                    </div>
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {/* İletişim Formu */}
+          <div className="md:col-span-2">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-semibold mb-6">
+                {t("contact_form")}
+              </h2>
+              <p className="mb-8">{t("contact_subtitle")}</p>
 
-                  <div className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-primary mt-1 mr-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                      />
-                    </svg>
-                    <div>
-                      <h3 className="font-semibold mb-1">{t("phone")}</h3>
-                      <p className="text-gray-600">+90 555 555 55 55</p>
-                    </div>
-                  </div>
+              {success ? (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                  <p>{t("contact_success")}</p>
+                </div>
+              ) : null}
 
-                  <div className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-primary mt-1 mr-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <div>
-                      <h3 className="font-semibold mb-1">{t("email")}</h3>
-                      <p className="text-gray-600">info@viptransfer.com</p>
-                    </div>
-                  </div>
+              <form ref={form} onSubmit={handleSubmit} className="space-y-4">
+                {/* Hidden input fields */}
+                <input type="hidden" name="system_date" defaultValue="" />
+                <input type="hidden" name="random" defaultValue="" />
+                <input
+                  type="hidden"
+                  name="language"
+                  defaultValue={i18n.language}
+                />
+
+                <div>
+                  <label className="block text-gray-700 mb-2">
+                    {t("contact_name")}:
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    className="w-full p-2 border rounded"
+                    required
+                  />
                 </div>
 
-                <div className="mt-8">
-                  <h3 className="font-semibold mb-4">{t("follow_us")}</h3>
-                  <div className="flex space-x-4">
-                    <a
-                      href="#"
-                      className="text-gray-600 hover:text-primary transition-colors"
-                    >
-                      <svg
-                        className="w-6 h-6"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z" />
-                      </svg>
-                    </a>
-                    <a
-                      href="#"
-                      className="text-gray-600 hover:text-primary transition-colors"
-                    >
-                      <svg
-                        className="w-6 h-6"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 0 1 1.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 0 1-1.153 1.772 4.915 4.915 0 0 1-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772A4.897 4.897 0 0 1 5.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 0 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
-                      </svg>
-                    </a>
-                    <a
-                      href="#"
-                      className="text-gray-600 hover:text-primary transition-colors"
-                    >
-                      <svg
-                        className="w-6 h-6"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                      </svg>
-                    </a>
-                  </div>
+                <div>
+                  <label className="block text-gray-700 mb-2">
+                    {t("contact_email")}:
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    className="w-full p-2 border rounded"
+                    required
+                  />
                 </div>
-              </div>
 
-              {/* Contact Form */}
-              <div>
-                <form ref={form} onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t("full_name")}
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-gray-700 mb-2">
+                    {t("contact_subject")}:
+                  </label>
+                  <input
+                    type="text"
+                    name="subject"
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t("email")}
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-gray-700 mb-2">
+                    {t("contact_message")}:
+                  </label>
+                  <textarea
+                    name="message"
+                    rows="5"
+                    className="w-full p-2 border rounded"
+                    required
+                  ></textarea>
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t("subject")}
-                    </label>
-                    <input
-                      type="text"
-                      name="subject"
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t("message")}
-                    </label>
-                    <textarea
-                      name="message"
-                      required
-                      rows="4"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                    ></textarea>
-                  </div>
-
+                <div>
                   <button
                     type="submit"
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-blue-300"
                     disabled={loading}
-                    className="btn-primary w-full py-3"
                   >
-                    {loading ? t("sending") : t("send_message")}
+                    {loading ? t("contact_sending") : t("contact_send")}
                   </button>
+                </div>
+              </form>
+            </div>
+          </div>
 
-                  {success && (
-                    <div className="text-green-600 text-center font-medium">
-                      {t("message_sent")}
-                    </div>
-                  )}
-                </form>
+          {/* İletişim Bilgileri */}
+          <div className="md:col-span-1">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-semibold mb-6">
+                {t("contact_info")}
+              </h2>
+
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium text-gray-800">
+                    {t("contact_address")}:
+                  </h3>
+                  <p className="mt-1">
+                    İstanbul, Türkiye
+                    <br />
+                    34000
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-medium text-gray-800">
+                    {t("contact_phone")}:
+                  </h3>
+                  <p className="mt-1">+90 507 030 72 80</p>
+                </div>
+
+                <div>
+                  <h3 className="font-medium text-gray-800">
+                    {t("contact_email")}:
+                  </h3>
+                  <p className="mt-1">info@rideorad.com</p>
+                </div>
+
+                <div className="pt-4">
+                  <h3 className="font-medium text-gray-800 mb-2">
+                    {t("contact_social")}:
+                  </h3>
+                  <div className="flex space-x-4">
+                    <a
+                      href="https://wa.me/905070307280"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-green-600 hover:text-green-800 text-xl"
+                    >
+                      <FontAwesomeIcon icon={faWhatsapp} size="lg" />
+                    </a>
+                    <a
+                      href="mailto:info@rideorad.com"
+                      className="text-blue-600 hover:text-blue-800 text-xl"
+                    >
+                      <FontAwesomeIcon icon={faEnvelope} size="lg" />
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Harita */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-2xl font-semibold mb-6">{t("our_location")}</h2>
+          <div className="aspect-video">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d385396.83462920394!2d28.73198846171249!3d41.00483176533782!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa7040068086b%3A0xe1ccfe98bc01b0d0!2zxLBzdGFuYnVs!5e0!3m2!1str!2str!4v1697395481441!5m2!1str!2str"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title={t("istanbul_map")}
+            ></iframe>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

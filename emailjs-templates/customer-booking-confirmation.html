@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rezervasyon Onayı</title>
+    <style type="text/css">
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+      body,
+      p,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: #f5f5f5;
+        color: #333333;
+        line-height: 1.6;
+      }
+
+      .email-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+      }
+
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        background: #4f46e5;
+        color: #ffffff;
+        border-radius: 10px 10px 0 0;
+      }
+
+      .booking-status {
+        background-color: #10b981;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        font-weight: 600;
+      }
+
+      .content {
+        padding: 30px;
+        background-color: white;
+        border-left: 1px solid #e0e0e0;
+        border-right: 1px solid #e0e0e0;
+      }
+
+      .greeting {
+        margin-bottom: 25px;
+      }
+
+      .trip-summary {
+        margin-bottom: 25px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .section-header {
+        background-color: #f7f7f7;
+        padding: 12px 15px;
+        font-weight: 600;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .detail-row {
+        display: flex;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+
+      .detail-label {
+        flex: 0 0 40%;
+        background-color: #f7f7f7;
+        padding: 10px 15px;
+        font-weight: 500;
+      }
+
+      .detail-value {
+        flex: 0 0 60%;
+        padding: 10px 15px;
+      }
+
+      .map-container {
+        margin: 25px 0;
+      }
+
+      .map-placeholder {
+        height: 200px;
+        background-color: #f7f7f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+      }
+
+      .vehicle-details {
+        margin-bottom: 25px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .price-details {
+        margin-bottom: 25px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .action-buttons {
+        margin: 25px 0;
+        text-align: center;
+      }
+
+      .action-button {
+        display: inline-block;
+        margin: 0 8px;
+        padding: 12px 25px;
+        background-color: #4f46e5;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .action-button.cancel {
+        background-color: #ef4444;
+      }
+
+      .action-button.modify {
+        background-color: #f59e0b;
+      }
+
+      .important-notes {
+        margin: 25px 0;
+        padding: 15px;
+        background-color: #fff7ed;
+        border-left: 4px solid #f59e0b;
+        border-radius: 4px;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 20px;
+        background-color: #4f46e5;
+        color: #ffffff;
+        border-radius: 0 0 10px 10px;
+        font-size: 14px;
+      }
+
+      .social-links {
+        margin: 15px 0;
+      }
+
+      .social-link {
+        display: inline-block;
+        margin: 0 10px;
+        color: white;
+        text-decoration: none;
+      }
+
+      .qr-code {
+        margin: 25px auto;
+        width: 150px;
+        height: 150px;
+        background-color: #f7f7f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+      }
+
+      .contact-support {
+        margin-top: 25px;
+        padding: 15px;
+        background-color: #f0f9ff;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      @media only screen and (max-width: 600px) {
+        .detail-row {
+          flex-direction: column;
+        }
+
+        .detail-label,
+        .detail-value {
+          flex: 0 0 100%;
+        }
+
+        .detail-label {
+          border-bottom: 1px solid #e0e0e0;
+        }
+
+        .action-buttons {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .action-button {
+          margin: 5px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="header">
+        <h1 style="font-size: 22px; margin-bottom: 5px">VIP Transfer</h1>
+        <p style="font-size: 14px; opacity: 0.9">Transfer Rezervasyonunuz</p>
+      </div>
+
+      <div class="booking-status">Rezervasyonunuz Onaylandı</div>
+
+      <div class="content">
+        <div class="greeting">
+          <h2 style="margin-bottom: 10px">Merhaba {{name}},</h2>
+          <p>
+            Transfer rezervasyonunuz başarıyla onaylanmıştır. Rezervasyon
+            detaylarınız aşağıda yer almaktadır.
+          </p>
+        </div>
+
+        <div class="trip-summary">
+          <div class="section-header">Transfer Detayları</div>
+
+          <div class="detail-row">
+            <div class="detail-label">Rezervasyon No</div>
+            <div class="detail-value">#TRF-{{random}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Tarih</div>
+            <div class="detail-value">{{date}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Saat</div>
+            <div class="detail-value">{{time}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Alış Noktası</div>
+            <div class="detail-value">{{pickup_location}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Bırakış Noktası</div>
+            <div class="detail-value">{{dropoff_location}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Yolcu Sayısı</div>
+            <div class="detail-value">{{passengers}}</div>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <div class="map-placeholder">
+            <p>Transfer Rotası Haritası</p>
+          </div>
+        </div>
+
+        <div class="vehicle-details">
+          <div class="section-header">Araç Bilgileri</div>
+
+          <div class="detail-row">
+            <div class="detail-label">Araç Tipi</div>
+            <div class="detail-value">{{vehicle_type}}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Kapasite</div>
+            <div class="detail-value">{{vehicle_capacity}} Kişi</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Özellikler</div>
+            <div class="detail-value">Klima, Wi-Fi, Bagaj Alanı</div>
+          </div>
+        </div>
+
+        <div class="price-details">
+          <div class="section-header">Ödeme Detayları</div>
+
+          <div class="detail-row">
+            <div class="detail-label">Transfer Ücreti</div>
+            <div class="detail-value">{{price}} ₺</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Ödeme Durumu</div>
+            <div class="detail-value">Onaylandı</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Ödeme Yöntemi</div>
+            <div class="detail-value">{{payment_method}}</div>
+          </div>
+        </div>
+
+        <div class="qr-code">
+          <p>QR Kod</p>
+        </div>
+
+        <div class="important-notes">
+          <h3 style="margin-bottom: 10px; color: #f59e0b">Önemli Bilgiler</h3>
+          <ul style="margin-left: 20px; margin-bottom: 0">
+            <li>
+              Lütfen transfer saatinden en az 15 dakika önce belirtilen alış
+              noktasında hazır olunuz.
+            </li>
+            <li>
+              Şoförümüz belirtilen alış noktasında sizi bekliyor olacaktır.
+            </li>
+            <li>
+              Şoförümüz uçuş gecikmeleri durumunda ekstra ücret almadan 1 saat
+              kadar bekleyecektir.
+            </li>
+            <li>
+              Rezervasyon değişikliği veya iptali için en geç 24 saat öncesinde
+              bildirimde bulunmanız gerekmektedir.
+            </li>
+          </ul>
+        </div>
+
+        <div class="action-buttons">
+          <a
+            href="https://viptransfer.com/reservations/{{random}}"
+            class="action-button"
+            >Rezervasyon Detayları</a
+          >
+          <a
+            href="https://viptransfer.com/reservations/{{random}}/modify"
+            class="action-button modify"
+            >Değiştir</a
+          >
+          <a
+            href="https://viptransfer.com/reservations/{{random}}/cancel"
+            class="action-button cancel"
+            >İptal Et</a
+          >
+        </div>
+
+        <div class="contact-support">
+          <h3 style="margin-bottom: 10px">Yardıma mı ihtiyacınız var?</h3>
+          <p>
+            Herhangi bir sorunuz veya sorununuz olduğunda, bize
+            <a href="mailto:info@viptransfer.com">info@viptransfer.com</a>
+            adresinden veya <strong>+90 242 123 45 67</strong> numaralı
+            telefondan ulaşabilirsiniz.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>&copy; 2023 VIP Transfer | Tüm Hakları Saklıdır.</p>
+        <div class="social-links">
+          <a href="https://facebook.com/viptransfer" class="social-link"
+            >Facebook</a
+          >
+          <a href="https://instagram.com/viptransfer" class="social-link"
+            >Instagram</a
+          >
+          <a href="https://twitter.com/viptransfer" class="social-link"
+            >Twitter</a
+          >
+        </div>
+        <p style="margin-top: 10px; font-size: 12px">
+          Bu e-posta, VIP Transfer ile yaptığınız rezervasyon için otomatik
+          olarak gönderilmiştir.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

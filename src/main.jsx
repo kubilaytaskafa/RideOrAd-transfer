@@ -2,6 +2,8 @@ import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+// EmailJS 4.x için güncellendi
+import * as emailjs from "@emailjs/browser";
 
 // Önce CSS dosyalarını import et
 import "./index.css";
@@ -15,6 +17,32 @@ import i18n from "./i18n";
 
 // Ana uygulamayı yükle
 import App from "./App";
+
+// EmailJS'yi global olarak başlat
+const initEmailJS = () => {
+  // Doğrudan sabit değer kullanarak başlatma
+  const publicKey = "OTdF2FlNNag3Xv85R";
+
+  if (publicKey) {
+    console.log("Global EmailJS başlatılıyor (sabit değer):", publicKey);
+    try {
+      // En basit haliyle başlat
+      emailjs.init(publicKey);
+      return true;
+    } catch (err) {
+      console.error("EmailJS başlatma hatası:", err);
+      return false;
+    }
+  } else {
+    console.error(
+      "EmailJS public key tanımlanmadı! Form özellikleri çalışmayabilir."
+    );
+    return false;
+  }
+};
+
+// EmailJS başlatma
+initEmailJS();
 
 // Yükleme ekranı bileşeni
 const LoadingComponent = () => (
